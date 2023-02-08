@@ -3,7 +3,7 @@ class CountryData {
     'India': ['Andhra Pradesh'],
   };
   final Map<String, List<String>> districts = {
-    'Andhra Pradesh': ['Annamaya'],
+    'Andhra Pradesh': ['Annamaya', 'Y.S.R. Kadapa'],
   };
   final Map<String, List<String>> mandals = {
     'Annamaya': ['Lakkireddypalli', 'Ramapuram'],
