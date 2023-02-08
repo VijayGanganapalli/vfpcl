@@ -511,6 +511,10 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (String? value) {
                   selectedState = null;
+                  selectedDistrict = null;
+                  selectedMandal = null;
+                  selectedRevenueVillage = null;
+                  selectedHabitation = null;
                   setState(() {
                     selectedCountry = value;
                   });
@@ -537,6 +541,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (value) {
                   selectedDistrict = null;
+                  selectedMandal = null;
+                  selectedRevenueVillage = null;
+                  selectedHabitation = null;
                   setState(() {
                     selectedState = value;
                   });
@@ -563,6 +570,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (String? value) {
                   selectedMandal = null;
+                  selectedRevenueVillage = null;
+                  selectedHabitation = null;
                   setState(() {
                     selectedDistrict = value;
                   });
@@ -589,6 +598,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (String? value) {
                   selectedRevenueVillage = null;
+                  selectedHabitation = null;
                   setState(() {
                     selectedMandal = value;
                   });
@@ -614,7 +624,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 }).toList(),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (String? value) {
-                  selectedHabitation = null;
+                  selectedMandal == null ? null : selectedHabitation = null;
                   setState(() {
                     selectedRevenueVillage = value;
                   });
@@ -640,6 +650,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 }).toList(),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (String? value) {
+                  selectedHabitation = null;
                   setState(() {
                     selectedHabitation = value;
                   });
