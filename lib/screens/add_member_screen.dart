@@ -1,5 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +10,7 @@ import 'package:vfpcl/constants/colors.dart';
 import 'package:vfpcl/constants/country_data.dart';
 import 'package:vfpcl/widgets/custom_form_field.dart';
 
+import '../widgets/custom_alert_dialog.dart';
 import '../widgets/custom_dropdown.dart';
 
 class AddMemberScreen extends StatefulWidget {
@@ -19,6 +23,7 @@ class AddMemberScreen extends StatefulWidget {
 class _AddMemberScreenState extends State<AddMemberScreen> {
   final _addMemberFormKey = GlobalKey<FormState>();
   int genderIconSelected = 0;
+  int memberId = 0;
   Uint8List? memberImageFile;
   bool isUploading = false;
   String? gender;
@@ -49,6 +54,11 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   TextEditingController habitationController = TextEditingController();
   TextEditingController nomineeController = TextEditingController();
   TextEditingController shareHoldingController = TextEditingController();
+
+  final CollectionReference _membersRef = FirebaseFirestore.instance
+      .collection("fpcs")
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection("members");
 
   String fatherOrHusbandNameHintText() {
     if (gender == "Female" && maritalStatus == "Married") {
@@ -84,6 +94,48 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     );
   }
 
+  bool loginFormLoading = false;
+  bool passwordVisibility = true;
+
+  Future<String?> addMember() async {
+    try {
+      final document = _membersRef.doc();
+      final uid = document.id;
+      final memberImgRef = FirebaseStorage.instance
+          .ref()
+          .child("memberImages")
+          .child("$uid.jpg");
+      await memberImgRef.putData(memberImageFile!);
+      await _membersRef.doc(uid).set({
+        'memberId': ++memberId,
+      });
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-email') {
+        return 'Email address is invalid';
+      } else if (e.code == 'user-not-found') {
+        return 'There is no account with this email';
+      } else if (e.code == 'user-disabled') {
+        return 'User corresponding to the given email has been disabled';
+      } else if (e.code == 'wrong-password') {
+        return 'You entered wrong password';
+      } else if (emailController.text.isEmpty) {
+        return 'Email field cannot be empty';
+      }
+      return e.message;
+    } catch (e) {
+      return e.toString();
+    }
+  }
+
+  void submitForm() async {
+    String? loginAccountFeedback = await addMember();
+    if (loginAccountFeedback != null) {
+      if (!mounted) return;
+      alertDialogBuilder(context, loginAccountFeedback);
+    }
+  }
+
   // upload form screen
   Widget uploadFormScreen() {
     return Scaffold(
@@ -93,7 +145,11 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                if (_addMemberFormKey.currentState!.validate()) {
+                  submitForm();
+                }
+              },
               icon: const Icon(Icons.cloud_upload_outlined),
             ),
           ),
