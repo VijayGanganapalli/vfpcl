@@ -1,9 +1,10 @@
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:vfpcl/constants/colors.dart';
@@ -24,7 +25,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   final _addMemberFormKey = GlobalKey<FormState>();
   int genderIconSelected = 0;
   int memberId = 0;
-  Uint8List? memberImageFile;
+  File? memberImageFile;
+  String? memberImgUrl;
   bool isUploading = false;
   String? gender;
   String? maritalStatus;
@@ -60,6 +62,22 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection("members");
 
+  Future getMembersCount() async {
+    QuerySnapshot memSnap = await _membersRef.get();
+    setState(() {
+      memberId = memSnap.size;
+    });
+  }
+
+  String maritalTitle() {
+    if (fatherOrHusbandNameHintText() == "Father name" && gender == "Female") {
+      return "D/o";
+    } else if (fatherOrHusbandNameHintText() == "Husband name") {
+      return "W/o";
+    }
+    return "S/o";
+  }
+
   String fatherOrHusbandNameHintText() {
     if (gender == "Female" && maritalStatus == "Married") {
       return "Husband name";
@@ -72,6 +90,39 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       return "Husband surname";
     }
     return "Father surname";
+  }
+
+  void _getFromCamera() async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+    );
+    _cropImage(pickedFile!.path);
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
+  void _getFromGallery() async {
+    XFile? pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    _cropImage(pickedFile!.path);
+    if (!mounted) return;
+    Navigator.pop(context);
+  }
+
+  void _cropImage(filePath) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: filePath,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+    if (croppedImage != null) {
+      setState(() {
+        memberImageFile = File(croppedImage.path);
+      });
+    } else {
+      memberImageFile = null;
+    }
   }
 
   Widget customRadio(String title, int index) {
@@ -94,9 +145,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     );
   }
 
-  bool loginFormLoading = false;
-  bool passwordVisibility = true;
-
   Future<String?> addMember() async {
     try {
       final document = _membersRef.doc();
@@ -105,9 +153,38 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
           .ref()
           .child("memberImages")
           .child("$uid.jpg");
-      await memberImgRef.putData(memberImageFile!);
+      await memberImgRef.putFile(memberImageFile!);
+      memberImgUrl = await memberImgRef.getDownloadURL();
+      QuerySnapshot memberSnapshot = await _membersRef.get();
+      setState(() {
+        memberId = memberSnapshot.size;
+      });
       await _membersRef.doc(uid).set({
         'memberId': ++memberId,
+        'memberImgUrl': memberImgUrl,
+        'fullName':
+            '${fullNameController.text.trim()} ${surnameController.text.trim()}',
+        'gender': gender,
+        'maritalStatus': maritalStatus,
+        'maritalTitle': maritalTitle(),
+        'fatherOrHusbandName':
+            '${fatherOrHusbandNameController.text.trim()} ${fatherOrHusbandSurnameController.text.trim()}',
+        'dateOfBirth':
+            DateFormat("dd-MM-yyyy").parse(dobController.text.trim()),
+        'mobileNumber': int.parse(mobileController.text.trim()),
+        'aadharNumber': int.parse(aadharController.text.trim()),
+        'pan': panController.text.trim(),
+        'email': emailController.text.trim(),
+        'landHolding': double.parse(landHoldingController.text.trim()),
+        'country': selectedCountry!.trim(),
+        'state': selectedState!.trim(),
+        'district': selectedDistrict!.trim(),
+        'mandal': selectedMandal!.trim(),
+        'revenueVillage': selectedRevenueVillage!.trim(),
+        'habitation': selectedHabitation!.trim(),
+        'nomineeFullName': nomineeController.text.trim(),
+        'relationWithNominee': relationWithNominee!.trim(),
+        'shareHolding': int.parse(shareHoldingController.text.trim()),
       });
       return null;
     } on FirebaseAuthException catch (e) {
@@ -166,16 +243,22 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                   ? const CircularProgressIndicator()
                   : Container(),
               Padding(
-                padding: const EdgeInsets.only(bottom: 32),
-                child: SizedBox(
-                  height: 250,
-                  width: MediaQuery.of(context).size.width * 0.8,
-                  child: Center(
+                padding: const EdgeInsets.only(bottom: 28),
+                child: Center(
+                  child: Container(
+                    height: 140,
+                    width: 140,
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: greyColor.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
                     child: memberImageFile != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.memory(memberImageFile!))
-                        : const Icon(Icons.image, size: 120, color: greyColor),
+                            borderRadius: BorderRadius.circular(100),
+                            child: Image.file(memberImageFile!),
+                          )
+                        : const Icon(Icons.person, size: 60, color: greyColor),
                   ),
                 ),
               ),
@@ -819,26 +902,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                         children: [
                           InkWell(
                             onTap: () async {
-                              try {
-                                final pickedImage = await ImagePicker()
-                                    .pickImage(source: ImageSource.camera);
-                                if (pickedImage != null) {
-                                  //String imagePath = pickedImage.path;
-                                  memberImageFile =
-                                      await pickedImage.readAsBytes();
-                                  // remove background from image
-                                  // make image transparent
-                                  setState(() {
-                                    memberImageFile;
-                                  });
-                                  if (!mounted) return;
-                                  Navigator.of(context).pop();
-                                }
-                              } catch (error) {
-                                setState(() {
-                                  memberImageFile = null;
-                                });
-                              }
+                              _getFromCamera();
                             },
                             child: Row(
                               children: [
@@ -856,26 +920,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                           ),
                           InkWell(
                             onTap: () async {
-                              try {
-                                final pickedImage = await ImagePicker()
-                                    .pickImage(source: ImageSource.gallery);
-                                if (pickedImage != null) {
-                                  //String imagePath = pickedImage.path;
-                                  memberImageFile =
-                                      await pickedImage.readAsBytes();
-                                  // remove background from image
-                                  // make image transparent
-                                  setState(() {
-                                    memberImageFile;
-                                  });
-                                  if (!mounted) return;
-                                  Navigator.of(context).pop();
-                                }
-                              } catch (error) {
-                                setState(() {
-                                  memberImageFile = null;
-                                });
-                              }
+                              _getFromGallery();
                             },
                             child: Row(
                               children: [

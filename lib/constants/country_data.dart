@@ -18,17 +18,17 @@ class CountryData {
       'Gudlavaripalli',
       'Lakkireddypalli',
       'Malapalli',
-      'Nandivandlapalli'
+      'Nandivandlapalli',
     ],
     'Maddirevula': [
       'Batamadigapalli',
       'Budithaguntapalli',
       'Edigapalli',
       'G.M.R. Colony',
-      'Nehru Nagar'
+      'Nehru Nagar',
     ],
     'Chitlur': ['Chitlur', 'Chenikkayavandlapalli', 'Majjigavandlapalli'],
     'Gopagudipalli': ['Adapalavandlapalli'],
-    'Hasanapuram': ['Musalireddygaripalli']
+    'Hasanapuram': ['Musalireddygaripalli'],
   };
 }
