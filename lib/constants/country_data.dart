@@ -13,7 +13,12 @@ class CountryData {
     'Ramapuram': ['Chitlur', 'Gopagudipalli', 'Hasanapuram'],
   };
   final Map<String, List<String>> habitations = {
-    'Ananthapuram': ['Edigapalli', 'Vaddepalli', 'Yenamalavandlapalli'],
+    'Ananthapuram': [
+      'Edigapalli',
+      'Dandevandlapalli',
+      'Vaddepalli',
+      'Yenamalavandlapalli'
+    ],
     'Lakkireddypalli': [
       'Gudlavaripalli',
       'Lakkireddypalli',
