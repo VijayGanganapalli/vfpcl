@@ -38,24 +38,26 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   String? selectedHabitation;
   String? relationWithNominee;
   DateTime selectedDob = DateTime(2004);
-  TextEditingController fullNameController = TextEditingController();
-  TextEditingController surnameController = TextEditingController();
-  TextEditingController fatherOrHusbandNameController = TextEditingController();
-  TextEditingController fatherOrHusbandSurnameController =
-      TextEditingController();
-  TextEditingController dobController = TextEditingController();
-  TextEditingController mobileController = TextEditingController();
-  TextEditingController aadharController = TextEditingController();
-  TextEditingController panController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController landHoldingController = TextEditingController();
-  TextEditingController stateController = TextEditingController();
-  TextEditingController districtController = TextEditingController();
-  TextEditingController mandalController = TextEditingController();
-  TextEditingController villageController = TextEditingController();
-  TextEditingController habitationController = TextEditingController();
-  TextEditingController nomineeController = TextEditingController();
-  TextEditingController shareHoldingController = TextEditingController();
+  DateTime selectedDoj = DateTime.now();
+
+  final fullNameController = TextEditingController();
+  final surnameController = TextEditingController();
+  final fatherOrHusbandNameController = TextEditingController();
+  final fatherOrHusbandSurnameController = TextEditingController();
+  final dobController = TextEditingController();
+  final mobileController = TextEditingController();
+  final aadharController = TextEditingController();
+  final panController = TextEditingController();
+  final emailController = TextEditingController();
+  final landHoldingController = TextEditingController();
+  final stateController = TextEditingController();
+  final districtController = TextEditingController();
+  final mandalController = TextEditingController();
+  final villageController = TextEditingController();
+  final habitationController = TextEditingController();
+  final nomineeController = TextEditingController();
+  final dateOfJoiningController = TextEditingController();
+  final shareHoldingController = TextEditingController();
 
   final CollectionReference _membersRef = FirebaseFirestore.instance
       .collection("fpcs")
@@ -146,19 +148,37 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   }
 
   Future<String?> addMember() async {
-    try {
-      final document = _membersRef.doc();
-      final uid = document.id;
+    final document = _membersRef.doc();
+    final uid = document.id;
+    QuerySnapshot memberSnapshot = await _membersRef.get();
+    var vAadhar = memberSnapshot.docs.map((e) => e['aadharNumber']);
+    var vMobile = memberSnapshot.docs.map((e) => e['mobileNumber']);
+    var vPan = memberSnapshot.docs.map((e) => e['pan']);
+    if (memberImageFile == null) {
+      if (!mounted) return null;
+      alertDialogBuilder(context, "Please upload member photo");
+    } else if (vAadhar
+        .any((element) => element == int.parse(aadharController.text.trim()))) {
+      if (!mounted) return null;
+      alertDialogBuilder(context, "This aadhar number already registered");
+    } else if (vMobile
+        .any((element) => element == int.parse(mobileController.text.trim()))) {
+      if (!mounted) return null;
+      alertDialogBuilder(context, "This mobile number already registered");
+    } else if (vPan
+        .any((element) => element == panController.text.trim().toString())) {
+      if (!mounted) return null;
+      alertDialogBuilder(context, "This pan number already registered");
+    } else {
+      setState(() {
+        memberId = memberSnapshot.size;
+      });
       final memberImgRef = FirebaseStorage.instance
           .ref()
           .child("memberImages")
           .child("$uid.jpg");
       await memberImgRef.putFile(memberImageFile!);
       memberImgUrl = await memberImgRef.getDownloadURL();
-      QuerySnapshot memberSnapshot = await _membersRef.get();
-      setState(() {
-        memberId = memberSnapshot.size;
-      });
       await _membersRef.doc(uid).set({
         'memberId': ++memberId,
         'memberImgUrl': memberImgUrl,
@@ -184,37 +204,54 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         'habitation': selectedHabitation!.trim(),
         'nomineeFullName': nomineeController.text.trim(),
         'relationWithNominee': relationWithNominee!.trim(),
+        'joiningDate':
+            DateFormat("dd-MM-yyyy").parse(dateOfJoiningController.text.trim()),
         'shareHolding': int.parse(shareHoldingController.text.trim()),
+      }).whenComplete(() async {
+        await alertDialogBuilder(context, "Member added successfully");
+        if (!mounted) return;
+        Navigator.pop(context);
       });
       return null;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email') {
-        return 'Email address is invalid';
-      } else if (e.code == 'user-not-found') {
-        return 'There is no account with this email';
-      } else if (e.code == 'user-disabled') {
-        return 'User corresponding to the given email has been disabled';
-      } else if (e.code == 'wrong-password') {
-        return 'You entered wrong password';
-      } else if (emailController.text.isEmpty) {
-        return 'Email field cannot be empty';
-      }
-      return e.message;
-    } catch (e) {
-      return e.toString();
     }
+    return null;
   }
 
-  void submitForm() async {
+  void _submitForm() async {
     String? loginAccountFeedback = await addMember();
+
     if (loginAccountFeedback != null) {
       if (!mounted) return;
       alertDialogBuilder(context, loginAccountFeedback);
     }
   }
 
-  // upload form screen
-  Widget uploadFormScreen() {
+  @override
+  void dispose() {
+    fullNameController.dispose();
+    surnameController.dispose();
+    fatherOrHusbandNameController.dispose();
+    fatherOrHusbandSurnameController.dispose();
+    dobController.dispose();
+    mobileController.dispose();
+    aadharController.dispose();
+    panController.dispose();
+    emailController.dispose();
+    landHoldingController.dispose();
+    stateController.dispose();
+    districtController.dispose();
+    districtController.dispose();
+    mandalController.dispose();
+    villageController.dispose();
+    habitationController.dispose();
+    nomineeController.dispose();
+    dateOfJoiningController.dispose();
+    shareHoldingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Add Member"),
@@ -224,7 +261,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
             child: IconButton(
               onPressed: () {
                 if (_addMemberFormKey.currentState!.validate()) {
-                  submitForm();
+                  _submitForm();
                 }
               },
               icon: const Icon(Icons.cloud_upload_outlined),
@@ -258,7 +295,72 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                             borderRadius: BorderRadius.circular(100),
                             child: Image.file(memberImageFile!),
                           )
-                        : const Icon(Icons.person, size: 60, color: greyColor),
+                        : InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text(
+                                      "Please choose an option",
+                                      style:
+                                          Theme.of(context).textTheme.headline2,
+                                    ),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        InkWell(
+                                          onTap: () async {
+                                            _getFromCamera();
+                                          },
+                                          child: Row(
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Icon(Icons.camera,
+                                                    color: primaryColor),
+                                              ),
+                                              Text(
+                                                "Capture from camera",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        InkWell(
+                                          onTap: () async {
+                                            _getFromGallery();
+                                          },
+                                          child: Row(
+                                            children: [
+                                              const Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Icon(Icons.image,
+                                                    color: primaryColor),
+                                              ),
+                                              Text(
+                                                "Select from gallery",
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            child: const Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 60,
+                              color: greyColor,
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -520,7 +622,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                   DateTime? pickedDate = await showDatePicker(
                     context: context,
                     initialDate: selectedDob,
-                    firstDate: DateTime(1962),
+                    firstDate: DateTime(1960),
                     lastDate: DateTime(2004),
                   );
                   if (pickedDate != null && pickedDate != selectedDob) {
@@ -848,6 +950,44 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 },
               ),
               CustomFormField(
+                readOnly: true,
+                autofocus: false,
+                controller: dateOfJoiningController,
+                mandatorySymbol: "*",
+                title: "Date of joining",
+                hintText: dateOfJoiningController.text.isEmpty
+                    ? "Select your date of joining"
+                    : dateOfJoiningController.text,
+                suffixIcon: const Icon(Icons.calendar_month),
+                obscureText: false,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.sentences,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onTap: () async {
+                  FocusScope.of(context).unfocus();
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDoj,
+                    firstDate: DateTime(2022),
+                    lastDate: DateTime(2100),
+                  );
+                  if (pickedDate != null && pickedDate != selectedDoj) {
+                    setState(() {
+                      selectedDoj = pickedDate;
+                      dateOfJoiningController.text =
+                          DateFormat('dd-MM-yyyy').format(pickedDate);
+                    });
+                  }
+                },
+                validator: (String? value) {
+                  return (value!.isEmpty ||
+                          !RegExp(r'[^-\s][\d-]+$').hasMatch(value))
+                      ? "Please enter valid text"
+                      : null;
+                },
+              ),
+              CustomFormField(
                 controller: shareHoldingController,
                 mandatorySymbol: "*",
                 title: "No of shares holding",
@@ -870,98 +1010,5 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         ),
       ),
     );
-  }
-
-  // default screen for upload new item
-  Widget defaultScreen() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Add Member"),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.add_photo_alternate,
-              color: greyColor,
-              size: 200,
-            ),
-            TextButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text(
-                        "Please choose an option",
-                        style: Theme.of(context).textTheme.headline2,
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          InkWell(
-                            onTap: () async {
-                              _getFromCamera();
-                            },
-                            child: Row(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child:
-                                      Icon(Icons.camera, color: primaryColor),
-                                ),
-                                Text(
-                                  "Capture from camera",
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                )
-                              ],
-                            ),
-                          ),
-                          InkWell(
-                            onTap: () async {
-                              _getFromGallery();
-                            },
-                            child: Row(
-                              children: [
-                                const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Icon(Icons.image, color: primaryColor),
-                                ),
-                                Text(
-                                  "Select from gallery",
-                                  style: Theme.of(context).textTheme.bodyText1,
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                elevation: 0.0,
-                backgroundColor: backgroundColor,
-              ),
-              child: Text(
-                "Add member photo",
-                style: Theme.of(context).textTheme.headline4?.copyWith(
-                      color: primaryColor,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return memberImageFile == null ? defaultScreen() : uploadFormScreen();
   }
 }
