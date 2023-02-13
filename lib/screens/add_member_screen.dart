@@ -37,8 +37,15 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   String? selectedRevenueVillage;
   String? selectedHabitation;
   String? relationWithNominee;
+  String? selectedDesignation;
   DateTime selectedDob = DateTime(2004);
   DateTime selectedDoj = DateTime.now();
+  DateTimeRange selectedDates = DateTimeRange(
+    start: DateTime.now(),
+    end: DateTime.now(),
+  );
+  String? startDate;
+  String? endDate;
 
   final fullNameController = TextEditingController();
   final surnameController = TextEditingController();
@@ -58,6 +65,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   final nomineeController = TextEditingController();
   final dateOfJoiningController = TextEditingController();
   final shareHoldingController = TextEditingController();
+  final directorPeriodController = TextEditingController();
 
   final CollectionReference _membersRef = FirebaseFirestore.instance
       .collection("fpcs")
@@ -207,6 +215,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         'joiningDate':
             DateFormat("dd-MM-yyyy").parse(dateOfJoiningController.text.trim()),
         'shareHolding': int.parse(shareHoldingController.text.trim()),
+        'designation': selectedDesignation!.trim(),
+        'directorPeriod': directorPeriodController.text.trim(),
       }).whenComplete(() async {
         await alertDialogBuilder(context, "Member added successfully");
         if (!mounted) return;
@@ -683,7 +693,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
               CustomFormField(
                 controller: panController,
                 mandatorySymbol: "*",
-                title: "PAN",
+                title: "Pan",
                 hintText: "Enter your pan number",
                 maxLength: 10,
                 counterText: "",
@@ -915,7 +925,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 validator: (String? value) {
                   return (value!.isEmpty ||
                           !RegExp(r'[^-\s][a-z A-Z]+$').hasMatch(value))
-                      ? "Please enter valid text"
+                      ? "Please enter nominee full name"
                       : null;
                 },
               ),
@@ -939,12 +949,13 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 }).toList(),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 onChanged: (String? value) {
+                  relationWithNominee = null;
                   setState(() {
                     relationWithNominee = value;
                   });
                 },
                 validator: (String? value) {
-                  return value!.isEmpty
+                  return relationWithNominee == null
                       ? "Please select relation with nominee"
                       : null;
                 },
@@ -970,7 +981,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                     context: context,
                     initialDate: selectedDoj,
                     firstDate: DateTime(2022),
-                    lastDate: DateTime(2100),
+                    lastDate: DateTime.now(),
                   );
                   if (pickedDate != null && pickedDate != selectedDoj) {
                     setState(() {
@@ -983,7 +994,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 validator: (String? value) {
                   return (value!.isEmpty ||
                           !RegExp(r'[^-\s][\d-]+$').hasMatch(value))
-                      ? "Please enter valid text"
+                      ? "Please enter valid date"
                       : null;
                 },
               ),
@@ -1004,6 +1015,83 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                       ? "Please enter number of shares holding"
                       : null;
                 },
+              ),
+              CustomDropdown(
+                title: "Designation",
+                mandatorySymbol: "*",
+                hintText: "Select your designation",
+                value: selectedDesignation,
+                items: ['Member', 'Director']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                onChanged: (String? value) {
+                  selectedDesignation = null;
+                  setState(() {
+                    selectedDesignation = value;
+                  });
+                },
+                validator: (String? value) {
+                  return selectedDesignation == null
+                      ? "Please select your designation"
+                      : null;
+                },
+              ),
+              Visibility(
+                visible: selectedDesignation == "Director",
+                child: CustomFormField(
+                  readOnly: true,
+                  autofocus: false,
+                  controller: directorPeriodController,
+                  mandatorySymbol: "*",
+                  title: "Director period",
+                  hintText: directorPeriodController.text.isEmpty
+                      ? "Select director period"
+                      : directorPeriodController.text,
+                  suffixIcon: const Icon(Icons.calendar_month),
+                  obscureText: false,
+                  textInputAction: TextInputAction.next,
+                  keyboardType: TextInputType.text,
+                  textCapitalization: TextCapitalization.sentences,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
+                    DateTimeRange? dateTimeRange = await showDateRangePicker(
+                      context: context,
+                      initialDateRange: selectedDates,
+                      firstDate: DateTime(2022, 10),
+                      lastDate: DateTime(2080),
+                    );
+
+                    if (dateTimeRange != null &&
+                        dateTimeRange != selectedDates) {
+                      var sDate =
+                          DateFormat("dd-MM-yyyy").format(selectedDates.start);
+                      var eDate =
+                          DateFormat("dd-MM-yyyy").format(selectedDates.end);
+                      setState(() {
+                        selectedDates = dateTimeRange;
+                        sDate = DateFormat("dd-MM-yyyy")
+                            .format(dateTimeRange.start);
+                        eDate =
+                            DateFormat("dd-MM-yyyy").format(dateTimeRange.end);
+                        startDate = sDate;
+                        endDate = eDate;
+                        directorPeriodController.text = "$startDate - $endDate";
+                      });
+                    }
+                  },
+                  validator: (String? value) {
+                    return (value!.isEmpty ||
+                            !RegExp(r'[^-\s][\d-]+$').hasMatch(value))
+                        ? "Please select valid date range"
+                        : null;
+                  },
+                ),
               ),
             ],
           ),
