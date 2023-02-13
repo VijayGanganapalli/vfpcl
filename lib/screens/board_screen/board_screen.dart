@@ -1,6 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../constants/colors.dart';
+import 'package:vfpcl/constants/colors.dart';
 
 class BoardScreen extends StatefulWidget {
   const BoardScreen({Key? key}) : super(key: key);
@@ -14,87 +15,136 @@ class _BoardScreenState extends State<BoardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: greyColor.withOpacity(0.08),
-      body: ListView.builder(
-        itemCount: 5,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-        itemBuilder: (BuildContext context, int index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 4, bottom: 4),
-            child: ListTile(
-              minLeadingWidth: 50,
-              contentPadding: const EdgeInsets.all(4),
-              tileColor: backgroundColor.withOpacity(0.9),
-              isThreeLine: true,
-              visualDensity: VisualDensity.compact,
-              leading: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: greyColor.withOpacity(0.1),
+      body: Padding(
+        padding: const EdgeInsets.all(6),
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('fpcs')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .collection('members')
+              .orderBy('designation', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Scaffold(
+                body: Center(
+                  child: Text("Error: ${snapshot.error}"),
                 ),
-                child: const Icon(Icons.person, size: 32),
-              ),
-              title: const Text("Vijay Kumar Ganganapalli"),
-              subtitle: Column(
-                //mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("S/o Venkatappa"),
-                  Row(
-                    children: [
-                      Text(
-                        "Designation: ",
-                        style: Theme.of(context).textTheme.bodyText2,
-                      ),
-                      const Text("Chairman"),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Mandal: ",
-                        style: Theme.of(context).textTheme.bodyText2,
-                      ),
-                      const Text("Lakkireddypalli"),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Duration: ",
-                        style: Theme.of(context).textTheme.bodyText2,
-                      ),
-                      const Text("Jan 2023 - 2028"),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: SizedBox(
-                width: 52,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Share",
-                    ),
-                    const Text(
-                      "Holding",
-                    ),
-                    Text(
-                      "100",
-                      style: TextStyle(
-                        color: defaultColor.withOpacity(0.5),
-                      ),
-                    ),
-                  ],
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(color: primaryColor),
                 ),
-              ),
-            ),
-          );
-        },
+              );
+            }
+            if (snapshot.data!.docs.isEmpty) {
+              return const Center(
+                child: Text('There is no directors'),
+              );
+            }
+            if (snapshot.hasData) {
+              return ListView(
+                physics: const BouncingScrollPhysics(),
+                children: snapshot.data!.docs.map((document) {
+                  final date = DateTime.parse(
+                      document['joiningDate'].toDate().toString());
+                  return Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Stack(
+                      alignment: Alignment.topRight,
+                      children: [
+                        ListTile(
+                          visualDensity: VisualDensity.adaptivePlatformDensity,
+                          isThreeLine: true,
+                          tileColor: backgroundColor,
+                          contentPadding: const EdgeInsets.all(6),
+                          horizontalTitleGap: 8,
+                          leading: CircleAvatar(
+                            backgroundColor: greyColor.withOpacity(0.2),
+                            radius: 30.0,
+                            child: document['memberImgUrl'] != null
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: Image.network(
+                                      document['memberImgUrl'],
+                                      fit: BoxFit.fill,
+                                    ),
+                                  )
+                                : const Icon(Icons.person,
+                                    size: 45, color: greyColor),
+                          ),
+                          title: Text(document['fullName']),
+                          subtitle: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "${document['maritalTitle']} ${document['fatherOrHusbandName']}"),
+                              const SizedBox(height: 2),
+                              Text(
+                                  "${document['habitation']}, ${document['revenueVillage']}"),
+                              const SizedBox(height: 2),
+                              Text(document['mandal']),
+                              const SizedBox(height: 2),
+                              Text("Designation: ${document['designation']}"),
+                            ],
+                          ),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "ID: ${document['memberId'].toString()}",
+                                softWrap: true,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: defaultColor.withOpacity(0.5),
+                                ),
+                              ),
+                              Text(
+                                "SH: ${document['shareHolding']}",
+                                softWrap: true,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: defaultColor.withOpacity(0.5),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12, right: 6),
+                          child: Text(
+                            "${date.day}-${date.month}-${date.year}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: defaultColor.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 84, right: 6),
+                          child: Text(
+                            "${document['directorPeriod']}",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: defaultColor.withOpacity(0.5),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ),
       ),
     );
   }
