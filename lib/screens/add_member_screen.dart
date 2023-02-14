@@ -1006,7 +1006,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 obscureText: false,
                 maxLength: 4,
                 counterText: "",
-                textInputAction: TextInputAction.done,
+                textInputAction: TextInputAction.next,
                 keyboardType: TextInputType.number,
                 textCapitalization: TextCapitalization.none,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -1061,11 +1061,23 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                   onTap: () async {
                     FocusScope.of(context).unfocus();
                     DateTimeRange? dateTimeRange = await showDateRangePicker(
-                      context: context,
-                      initialDateRange: selectedDates,
-                      firstDate: DateTime(2022, 10),
-                      lastDate: DateTime(2080),
-                    );
+                        context: context,
+                        initialDateRange: selectedDates,
+                        firstDate: DateTime(2023),
+                        lastDate: DateTime(2080),
+                        saveText: 'Done',
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: primaryColor,
+                                onPrimary: defaultColor.withOpacity(0.6),
+                                onSurface: primaryColor,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        });
 
                     if (dateTimeRange != null &&
                         dateTimeRange != selectedDates) {
