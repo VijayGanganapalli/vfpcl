@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vfpcl/constants/colors.dart';
 
-import 'login_screen.dart';
 import 'main_screen/main_screen.dart';
+import 'sign_in_screen/sign_in_screen.dart';
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({Key? key}) : super(key: key);
@@ -31,7 +31,7 @@ class LandingScreen extends StatelessWidget {
           if (snapshot.hasData) {
             return const MainScreen();
           } else {
-            return const LoginScreen();
+            return const SignInScreen();
           }
         },
       ),
