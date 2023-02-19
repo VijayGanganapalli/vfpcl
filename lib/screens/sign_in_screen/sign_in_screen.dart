@@ -113,7 +113,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: (String? value) {
                           return (value!.isEmpty ||
-                                  !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  !RegExp(r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
                                       .hasMatch(value))
                               ? "Please enter a valid email address"
                               : null;
