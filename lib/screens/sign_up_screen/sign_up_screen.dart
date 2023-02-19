@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../constants/colors.dart';
 import '../../constants/device.dart';
 import '../../widgets/custom_alert_dialog.dart';
 import '../../widgets/custom_button.dart';
@@ -18,39 +20,72 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final signUpFormKey = GlobalKey<FormState>();
   final device = Device();
   DateTime selectedDoi = DateTime.now();
-  final fpcNameController = TextEditingController();
+  final companyNameController = TextEditingController();
   final incorporatedDateController = TextEditingController();
-  final dateOfJoiningController = TextEditingController();
   final cinController = TextEditingController();
   final panController = TextEditingController();
   final tanController = TextEditingController();
   final emailController = TextEditingController();
   final contactController = TextEditingController();
   final companyAddressController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  bool loginFormLoading = false;
+  bool signUpFormLoading = false;
   bool passwordVisibility = true;
 
-  Future<String?> signInAccount() async {
+  Future<String?> signUpAccount() async {
+    if (passwordController.text.trim() !=
+        confirmPasswordController.text.trim()) {
+      return 'Password and confirm password should be same';
+    }
+    if (passwordController.text.trim() ==
+        confirmPasswordController.text.trim()) {
+      confirmPasswordController.text.trim();
+    }
+
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: fpcNameController.text.trim(),
-        password: incorporatedDateController.text.trim(),
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: confirmPasswordController.text.trim(),
       );
+      var uid = FirebaseAuth.instance.currentUser!.uid;
+      FirebaseFirestore.instance.collection('fpcs').doc(uid).set({
+        'uid': uid,
+        'companyName': companyNameController.text.trim(),
+        'companyIncorporatedDate': DateFormat("dd-MM-yyyy")
+            .parse(incorporatedDateController.text.trim()),
+        'companyCIN': cinController.text.trim().toUpperCase(),
+        'companyPAN': panController.text.trim().toUpperCase(),
+        'companyTAN': tanController.text.trim().toUpperCase(),
+        'emailAddress': emailController.text.trim(),
+        'contactNumber': int.parse(contactController.text.trim()),
+        'companyAddress': companyAddressController.text.trim(),
+        'createdAt': Timestamp.now(),
+      }).whenComplete(() async {
+        await alertDialogBuilder(context, "Account created successfully");
+        if (!mounted) return;
+        Navigator.pop(context);
+      }).catchError((error) async {
+        await alertDialogBuilder(
+            context, "You are not able to create account due to $error");
+        if (!mounted) return;
+        Navigator.pop(context);
+      });
+
       return null;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'invalid-email') {
-        return 'Email address is invalid';
-      } else if (e.code == 'user-not-found') {
-        return 'There is no account with this email';
-      } else if (e.code == 'user-disabled') {
-        return 'User corresponding to the given email has been disabled';
-      } else if (e.code == 'wrong-password') {
-        return 'You entered wrong password';
-      } else if (fpcNameController.text.isEmpty) {
-        return 'Email field cannot be empty';
-      } else if (incorporatedDateController.text.isEmpty) {
-        return 'Password field cannot be empty';
+      if (companyNameController.text.isEmpty ||
+          incorporatedDateController.text.isEmpty ||
+          cinController.text.isEmpty ||
+          panController.text.isEmpty ||
+          tanController.text.isEmpty ||
+          emailController.text.isEmpty ||
+          contactController.text.isEmpty ||
+          companyAddressController.text.isEmpty ||
+          passwordController.text.isEmpty ||
+          confirmPasswordController.text.isEmpty) {
+        return 'Please fill all mandatory fields';
       }
       return e.message;
     } catch (e) {
@@ -60,22 +95,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void submitForm() async {
     setState(() {
-      loginFormLoading = true;
+      signUpFormLoading = true;
     });
-    String? loginAccountFeedback = await signInAccount();
+    String? loginAccountFeedback = await signUpAccount();
     if (loginAccountFeedback != null) {
       if (!mounted) return;
       alertDialogBuilder(context, loginAccountFeedback);
-
       setState(() {
-        loginFormLoading = false;
+        signUpFormLoading = false;
       });
     }
   }
 
   @override
   void dispose() {
-    fpcNameController.dispose();
+    companyNameController.dispose();
     incorporatedDateController.dispose();
     super.dispose();
   }
@@ -101,12 +135,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 Expanded(
                   child: ListView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
                     physics: const BouncingScrollPhysics(),
                     children: [
                       SizedBox(
                         width: device.width(context),
                         child: CustomFormField(
-                          controller: fpcNameController,
+                          controller: companyNameController,
                           mandatorySymbol: "*",
                           keyboardType: TextInputType.text,
                           title: "Producer company name",
@@ -119,7 +155,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             return (value!.isEmpty ||
                                     !RegExp(r'[^-\s][a-z A-Z]+$')
                                         .hasMatch(value))
-                                ? "Please enter valid name"
+                                ? "Please enter valid company name"
                                 : null;
                           },
                         ),
@@ -209,7 +245,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         !RegExp(r'[^-\s][A-Z\d]+$')
                                             .hasMatch(value)) ||
                                     value.length != 10
-                                ? "Please enter valid pan number"
+                                ? "Please enter valid PAN"
                                 : null;
                           },
                         ),
@@ -233,7 +269,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         !RegExp(r'[^-\s][A-Z\d]+$')
                                             .hasMatch(value)) ||
                                     value.length != 10
-                                ? "Please enter valid pan number"
+                                ? "Please enter valid TAN"
                                 : null;
                           },
                         ),
@@ -302,6 +338,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           },
                         ),
                       ),
+                      SizedBox(
+                        child: CustomFormField(
+                          obscureText: true,
+                          controller: passwordController,
+                          title: "Password",
+                          mandatorySymbol: " *",
+                          hintText: "Set password",
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          textCapitalization: TextCapitalization.none,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.next,
+                          validator: (String? value) {
+                            return (value!.isEmpty ||
+                                    !RegExp(r'^(?!\s)(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
+                                        .hasMatch(value))
+                                ? "Contains at least one letter, number, special char"
+                                : null;
+                          },
+                        ),
+                      ),
+                      SizedBox(
+                        child: CustomFormField(
+                          obscureText: passwordVisibility,
+                          controller: confirmPasswordController,
+                          title: "Confirm password",
+                          mandatorySymbol: " *",
+                          hintText: "Enter confirm password",
+                          suffixIcon: IconButton(
+                              color: primaryColor,
+                              icon: passwordVisibility
+                                  ? const Icon(Icons.visibility_outlined)
+                                  : const Icon(Icons.visibility_off_outlined),
+                              onPressed: () {
+                                setState(() {
+                                  passwordVisibility = !passwordVisibility;
+                                });
+                              }),
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          textCapitalization: TextCapitalization.none,
+                          keyboardType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
+                          validator: (String? value) {
+                            return (value!.isEmpty ||
+                                    !RegExp(r'^(?!\s)(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
+                                        .hasMatch(value))
+                                ? "Contains at least one letter, number, special char"
+                                : null;
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -310,14 +396,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 18),
                     child: CustomButton(
-                      isLoading: loginFormLoading,
+                      isLoading: signUpFormLoading,
                       buttonText: "Sign Up",
                       outlineButton: false,
                       onPressed: () {
-                        submitForm();
-                        setState(() {
-                          loginFormLoading = true;
-                        });
+                        try {
+                          if (signUpFormKey.currentState!.validate()) {
+                            submitForm();
+                          } else {
+                            submitForm();
+                          }
+                        } finally {
+                          setState(() {
+                            signUpFormLoading = true;
+                          });
+                        }
                       },
                     ),
                   ),
@@ -327,7 +420,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: CustomButton(
-                      isLoading: loginFormLoading = false,
+                      isLoading: signUpFormLoading = false,
                       buttonText: "Back",
                       outlineButton: true,
                       onPressed: () {
