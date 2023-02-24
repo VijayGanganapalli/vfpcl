@@ -42,8 +42,13 @@ class _MembersScreenState extends State<MembersScreen> {
               );
             }
             if (snapshot.data!.docs.isEmpty) {
-              return const Center(
-                child: Text('There is no members enrolled'),
+              return Center(
+                child: Text(
+                  'There is no members enrolled',
+                  style: TextStyle(
+                    color: Colors.black.withOpacity(0.4),
+                  ),
+                ),
               );
             }
             if (snapshot.hasData) {

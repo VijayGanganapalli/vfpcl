@@ -40,8 +40,13 @@ class _BoardScreenState extends State<BoardScreen> {
               );
             }
             if (snapshot.data!.docs.isEmpty) {
-              return const Center(
-                child: Text('There is no directors'),
+              return Center(
+                child: Text(
+                  'There is no directors',
+                  style: TextStyle(
+                    color: Colors.black.withOpacity(0.4),
+                  ),
+                ),
               );
             }
             if (snapshot.hasData) {
