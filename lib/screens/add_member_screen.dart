@@ -47,25 +47,28 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   String? startDate;
   String? endDate;
 
-  final fullNameController = TextEditingController();
-  final surnameController = TextEditingController();
-  final fatherOrHusbandNameController = TextEditingController();
-  final fatherOrHusbandSurnameController = TextEditingController();
-  final dobController = TextEditingController();
-  final mobileController = TextEditingController();
-  final aadharController = TextEditingController();
-  final panController = TextEditingController();
-  final emailController = TextEditingController();
-  final landHoldingController = TextEditingController();
-  final stateController = TextEditingController();
-  final districtController = TextEditingController();
-  final mandalController = TextEditingController();
-  final villageController = TextEditingController();
-  final habitationController = TextEditingController();
-  final nomineeController = TextEditingController();
-  final dateOfJoiningController = TextEditingController();
-  final shareHoldingController = TextEditingController();
-  final directorPeriodController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController surnameController = TextEditingController();
+  final TextEditingController fatherOrHusbandNameController =
+      TextEditingController();
+  final TextEditingController fatherOrHusbandSurnameController =
+      TextEditingController();
+  final TextEditingController dobController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController aadharController = TextEditingController();
+  final TextEditingController panController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController landHoldingController = TextEditingController();
+  final TextEditingController stateController = TextEditingController();
+  final TextEditingController districtController = TextEditingController();
+  final TextEditingController mandalController = TextEditingController();
+  final TextEditingController villageController = TextEditingController();
+  final TextEditingController habitationController = TextEditingController();
+  final TextEditingController nomineeController = TextEditingController();
+  final TextEditingController dateOfJoiningController = TextEditingController();
+  final TextEditingController shareHoldingController = TextEditingController();
+  final TextEditingController directorPeriodController =
+      TextEditingController();
 
   final CollectionReference _membersRef = FirebaseFirestore.instance
       .collection("fpcs")

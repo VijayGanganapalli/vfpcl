@@ -17,19 +17,22 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final signUpFormKey = GlobalKey<FormState>();
-  final device = Device();
+  final GlobalKey<FormState> signUpFormKey = GlobalKey<FormState>();
+  final Device device = Device();
   DateTime selectedDoi = DateTime.now();
-  final companyNameController = TextEditingController();
-  final incorporatedDateController = TextEditingController();
-  final cinController = TextEditingController();
-  final panController = TextEditingController();
-  final tanController = TextEditingController();
-  final emailController = TextEditingController();
-  final contactController = TextEditingController();
-  final companyAddressController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final TextEditingController companyNameController = TextEditingController();
+  final TextEditingController incorporatedDateController =
+      TextEditingController();
+  final TextEditingController cinController = TextEditingController();
+  final TextEditingController panController = TextEditingController();
+  final TextEditingController tanController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController contactController = TextEditingController();
+  final TextEditingController companyAddressController =
+      TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   bool signUpFormLoading = false;
   bool passwordVisibility = true;
@@ -111,6 +114,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void dispose() {
     companyNameController.dispose();
     incorporatedDateController.dispose();
+    cinController.dispose();
+    panController.dispose();
+    tanController.dispose();
+    emailController.dispose();
+    contactController.dispose();
+    companyAddressController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 

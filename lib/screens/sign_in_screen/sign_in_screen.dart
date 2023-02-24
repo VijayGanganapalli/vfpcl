@@ -18,8 +18,8 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
-  final signInFormKey = GlobalKey<FormState>();
-  final device = Device();
+  final GlobalKey<FormState> signInFormKey = GlobalKey<FormState>();
+  final Device device = Device();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
