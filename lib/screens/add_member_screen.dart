@@ -163,6 +163,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   Future<String?> addMember() async {
     final document = _membersRef.doc();
     final uid = document.id;
+    final user = FirebaseAuth.instance.currentUser!;
     QuerySnapshot memberSnapshot = await _membersRef.get();
     var vAadhar = memberSnapshot.docs.map((e) => e['aadharNumber']);
     var vMobile = memberSnapshot.docs.map((e) => e['mobileNumber']);
@@ -189,6 +190,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       final memberImgRef = FirebaseStorage.instance
           .ref()
           .child("memberImages")
+          .child("${user.email}")
           .child("$uid.jpg");
       await memberImgRef.putFile(memberImageFile!);
       memberImgUrl = await memberImgRef.getDownloadURL();
@@ -223,7 +225,18 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         'designation': selectedDesignation!.trim(),
         'directorPeriod': directorPeriodController.text.trim(),
       }).whenComplete(() async {
+        setState(() {
+          isUploading = false;
+        });
         await alertDialogBuilder(context, "Member added successfully");
+        if (!mounted) return;
+        Navigator.pop(context);
+      }).catchError((error) async {
+        setState(() {
+          isUploading = false;
+        });
+        await alertDialogBuilder(
+            context, "You are not able to add member due to $error");
         if (!mounted) return;
         Navigator.pop(context);
       });
@@ -233,8 +246,13 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   }
 
   void _submitForm() async {
+    setState(() {
+      isUploading = true;
+    });
     String? loginAccountFeedback = await addMember();
-
+    setState(() {
+      isUploading = false;
+    });
     if (loginAccountFeedback != null) {
       if (!mounted) return;
       alertDialogBuilder(context, loginAccountFeedback);
@@ -295,7 +313,13 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                       _submitForm();
                     }
                   },
-                  icon: const Icon(Icons.cloud_upload_outlined),
+                  icon: isUploading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(),
+                        )
+                      : const Icon(Icons.cloud_upload_outlined),
                 ),
               ),
             ],
@@ -403,7 +427,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                       obscureText: false,
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.text,
-                      textCapitalization: TextCapitalization.sentences,
+                      textCapitalization: TextCapitalization.words,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (String? value) {
                         return (value!.isEmpty ||

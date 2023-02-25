@@ -22,7 +22,7 @@ class _BoardScreenState extends State<BoardScreen> {
               .collection('fpcs')
               .doc(FirebaseAuth.instance.currentUser!.uid)
               .collection('members')
-              .orderBy('designation', descending: true)
+              .where('designation', isEqualTo: 'Director')
               .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
