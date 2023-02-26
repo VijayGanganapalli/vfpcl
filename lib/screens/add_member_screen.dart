@@ -290,7 +290,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
         shrinkWrap: true,
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverAppBar.large(
+          SliverAppBar.medium(
             stretch: true,
             title: Text(
               "Add Member",
@@ -332,10 +332,10 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 28),
+                      padding: const EdgeInsets.only(bottom: 16),
                       child: Center(
                         child: Container(
-                          height: 140,
+                          height: MediaQuery.of(context).size.width,
                           width: 140,
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
