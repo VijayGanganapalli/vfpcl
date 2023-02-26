@@ -9,10 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:vfpcl/constants/colors.dart';
 
-import '../constants/country_data.dart';
-import '../widgets/custom_alert_dialog.dart';
-import '../widgets/custom_dropdown.dart';
-import '../widgets/custom_form_field.dart';
+import '../../constants/country_data.dart';
+import '../../widgets/custom_alert_dialog.dart';
+import '../../widgets/custom_dropdown.dart';
+import '../../widgets/custom_form_field.dart';
 
 class AddMemberScreen extends StatefulWidget {
   const AddMemberScreen({Key? key}) : super(key: key);

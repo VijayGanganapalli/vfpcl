@@ -7,8 +7,8 @@ import 'package:vfpcl/widgets/custom_button.dart';
 import 'package:vfpcl/widgets/custom_form_field.dart';
 
 import '../../widgets/custom_alert_dialog.dart';
-import '../forgot_password_screen.dart';
 import '../sign_up_screen/sign_up_screen.dart';
+import 'forgot_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);

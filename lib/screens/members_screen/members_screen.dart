@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vfpcl/constants/colors.dart';
 
-import '../add_member_screen.dart';
+import 'add_member_screen.dart';
 
 class MembersScreen extends StatefulWidget {
   const MembersScreen({Key? key}) : super(key: key);

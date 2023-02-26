@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vfpcl/constants/device.dart';
 
-import '../constants/colors.dart';
-import '../widgets/custom_alert_dialog.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/custom_form_field.dart';
+import '../../constants/colors.dart';
+import '../../widgets/custom_alert_dialog.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/custom_form_field.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({Key? key}) : super(key: key);
