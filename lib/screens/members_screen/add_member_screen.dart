@@ -294,7 +294,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
             stretch: true,
             title: Text(
               "Add Member",
-              style: Theme.of(context).textTheme.headline2,
+              style: Theme.of(context).textTheme.headline2!.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
             ),
             actions: [
               Padding(
@@ -335,7 +337,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                       padding: const EdgeInsets.only(bottom: 16),
                       child: Center(
                         child: Container(
-                          height: MediaQuery.of(context).size.width,
+                          height: 140,
                           width: 140,
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
