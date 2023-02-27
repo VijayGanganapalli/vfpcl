@@ -37,7 +37,7 @@ class _SignInScreenState extends State<SignInScreen> {
       if (e.code == 'invalid-email') {
         return 'Email address is invalid';
       } else if (e.code == 'user-not-found') {
-        return 'There is no account with this email. Please sign up then try again';
+        return 'There is no account with this email. Please try with another one';
       } else if (e.code == 'user-disabled') {
         return 'User corresponding to the given email has been disabled';
       } else if (e.code == 'wrong-password') {
@@ -128,7 +128,17 @@ class _SignInScreenState extends State<SignInScreen> {
                         keyboardType: TextInputType.text,
                         title: "Password",
                         hintText: "Enter password",
-                        obscureText: true,
+                        obscureText: passwordVisibility,
+                        suffixIcon: IconButton(
+                            color: primaryColor,
+                            icon: passwordVisibility
+                                ? const Icon(Icons.visibility_outlined)
+                                : const Icon(Icons.visibility_off_outlined),
+                            onPressed: () {
+                              setState(() {
+                                passwordVisibility = !passwordVisibility;
+                              });
+                            }),
                         textCapitalization: TextCapitalization.none,
                         textInputAction: TextInputAction.done,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
