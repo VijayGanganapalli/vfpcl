@@ -171,14 +171,14 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     if (memberImageFile == null) {
       if (!mounted) return null;
       alertDialogBuilder(context, "Please upload member photo");
-    } else if (vAadhar
-        .any((element) => element == int.parse(aadharController.text.trim()))) {
-      if (!mounted) return null;
-      alertDialogBuilder(context, "This aadhar number already registered");
     } else if (vMobile
         .any((element) => element == int.parse(mobileController.text.trim()))) {
       if (!mounted) return null;
       alertDialogBuilder(context, "This mobile number already registered");
+    } else if (vAadhar
+        .any((element) => element == int.parse(aadharController.text.trim()))) {
+      if (!mounted) return null;
+      alertDialogBuilder(context, "This aadhar number already registered");
     } else if (vPan
         .any((element) => element == panController.text.trim().toString())) {
       if (!mounted) return null;
