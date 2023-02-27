@@ -312,6 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       const TextStyle(color: backgroundColor),
                                 );
                               }
+
                               return const SizedBox(
                                 width: 10,
                                 height: 10,
