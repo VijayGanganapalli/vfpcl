@@ -24,11 +24,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Profile",
-          style: Theme.of(context).textTheme.headline2!.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
         ),
       ),
       body: StreamBuilder(
