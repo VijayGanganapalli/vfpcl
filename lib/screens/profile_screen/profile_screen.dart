@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }
           if (snapshot.hasData) {
-            var companyName = snapshot.data!.get('companyName');
+            //var companyName = snapshot.data!.get('companyName');
             return ListView(
               physics: const BouncingScrollPhysics(),
               padding: const EdgeInsets.all(16),
@@ -62,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  companyName.toString().split(" ")[0],
+                  snapshot.data!.get('companyName').toString().split(" ")[0],
                   textAlign: TextAlign.center,
                   softWrap: true,
                   style: const TextStyle(
