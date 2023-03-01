@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'VFPCL',
       theme: ThemeData(
+          errorColor: errorColor,
           primarySwatch: primarySwatch,
           appBarTheme: const AppBarTheme(
             foregroundColor: defaultColor,
