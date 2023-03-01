@@ -95,6 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: greyColor),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   "Address: ${snapshot.data!.get('companyAddress')}",
                   textAlign: TextAlign.center,
@@ -111,6 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   indent: MediaQuery.of(context).size.width / 2.8,
                   endIndent: MediaQuery.of(context).size.width / 2.8,
                 ),
+                const SizedBox(height: 6),
                 const CustomListTile(
                   leading: Icon(Icons.settings_outlined),
                   title: "Settings",
