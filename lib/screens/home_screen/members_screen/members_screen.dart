@@ -63,9 +63,12 @@ class _MembersScreenState extends State<MembersScreen> {
                       alignment: Alignment.topRight,
                       children: [
                         ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           visualDensity: VisualDensity.adaptivePlatformDensity,
                           isThreeLine: true,
-                          tileColor: backgroundColor,
+                          tileColor: primaryColor.withOpacity(0.06),
                           contentPadding: const EdgeInsets.all(6),
                           horizontalTitleGap: 8,
                           leading: CircleAvatar(
@@ -144,7 +147,8 @@ class _MembersScreenState extends State<MembersScreen> {
           );
         },
         backgroundColor: primaryColor,
-        child: const Icon(Icons.add),
+        elevation: 8,
+        child: const Icon(Icons.person_add_alt_1),
       ),
     );
   }

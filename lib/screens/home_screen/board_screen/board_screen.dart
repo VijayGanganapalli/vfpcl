@@ -61,9 +61,12 @@ class _BoardScreenState extends State<BoardScreen> {
                       alignment: Alignment.topRight,
                       children: [
                         ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          tileColor: primaryColor.withOpacity(0.06),
                           visualDensity: VisualDensity.adaptivePlatformDensity,
                           isThreeLine: true,
-                          tileColor: backgroundColor,
                           contentPadding: const EdgeInsets.all(6),
                           horizontalTitleGap: 8,
                           leading: CircleAvatar(

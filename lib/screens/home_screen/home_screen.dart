@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:vfpcl/screens/board_screen/board_screen.dart';
-import 'package:vfpcl/screens/dashboard_screen/dashboard_screen.dart';
-import 'package:vfpcl/screens/members_screen/members_screen.dart';
+import 'package:vfpcl/screens/home_screen/home_dashboard_screen/home_dashboard_screen.dart';
 
 import '../../constants/colors.dart';
+import 'board_screen/board_screen.dart';
+import 'members_screen/members_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String appBarTitle;
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: const TabBarView(
           children: [
-            DashboardScreen(),
+            HomeDashboardScreen(),
             MembersScreen(),
             BoardScreen(),
           ],

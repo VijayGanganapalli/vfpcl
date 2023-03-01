@@ -3,14 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:vfpcl/constants/colors.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+class HomeDashboardScreen extends StatefulWidget {
+  const HomeDashboardScreen({Key? key}) : super(key: key);
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +21,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Card(
             elevation: 4,
+            color: primaryColor,
+            shadowColor: primaryColor.withOpacity(0.2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -40,7 +42,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Text(
                       "Members information",
                       style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color: defaultColor.withOpacity(0.4),
+                            color: backgroundColor,
                             letterSpacing: 0.8,
                           ),
                     ),
@@ -51,9 +53,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   height: 140,
                   width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: backgroundColor.withOpacity(0.95),
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(8),
                       bottomRight: Radius.circular(8),
                     ),
@@ -215,6 +217,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 12),
           Card(
             elevation: 4,
+            color: primaryColor,
+            shadowColor: primaryColor.withOpacity(0.2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -234,7 +238,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Text(
                       "Board members information",
                       style: Theme.of(context).textTheme.headline4!.copyWith(
-                            color: defaultColor.withOpacity(0.4),
+                            color: backgroundColor,
                             letterSpacing: 0.8,
                           ),
                     ),
@@ -245,9 +249,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   height: 140,
                   width: MediaQuery.of(context).size.width,
-                  decoration: const BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: backgroundColor.withOpacity(0.95),
+                    borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(8),
                       bottomRight: Radius.circular(8),
                     ),

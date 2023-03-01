@@ -9,10 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:vfpcl/constants/colors.dart';
 
-import '../../constants/country_data.dart';
-import '../../widgets/custom_alert_dialog.dart';
-import '../../widgets/custom_dropdown.dart';
-import '../../widgets/custom_form_field.dart';
+import '../../../constants/country_data.dart';
+import '../../../widgets/custom_alert_dialog.dart';
+import '../../../widgets/custom_dropdown.dart';
+import '../../../widgets/custom_form_field.dart';
 
 class AddMemberScreen extends StatefulWidget {
   const AddMemberScreen({Key? key}) : super(key: key);
@@ -76,13 +76,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
       .collection("fpcs")
       .doc(FirebaseAuth.instance.currentUser!.uid)
       .collection("members");
-
-  Future getMembersCount() async {
-    QuerySnapshot memSnap = await _membersRef.get();
-    setState(() {
-      memberId = memSnap.size;
-    });
-  }
 
   String maritalTitle() {
     if (fatherOrHusbandNameHintText() == "Father name" && gender == "Female") {
@@ -546,14 +539,14 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                           visible: isGenderValidate,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const SizedBox(width: 12),
+                            children: const [
+                              SizedBox(width: 12),
                               Text(
                                 "Please select gender",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.red[700],
+                                  color: errorColor,
                                 ),
                               ),
                             ],
@@ -632,14 +625,14 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                           visible: isMaritalStatusValidate,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const SizedBox(width: 12),
+                            children: const [
+                              SizedBox(width: 12),
                               Text(
                                 "Please select marital status",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.red[700],
+                                  color: errorColor,
                                 ),
                               ),
                             ],
@@ -1185,7 +1178,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
