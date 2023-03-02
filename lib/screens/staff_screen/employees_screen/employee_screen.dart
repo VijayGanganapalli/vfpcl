@@ -16,7 +16,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: greyColor.withOpacity(0.08),
+      backgroundColor: greyColor.withOpacity(0.05),
       body: Padding(
         padding: const EdgeInsets.all(6),
         child: StreamBuilder(

@@ -37,7 +37,7 @@ class _SignInScreenState extends State<SignInScreen> {
       if (e.code == 'invalid-email') {
         return 'Email address is invalid';
       } else if (e.code == 'user-not-found') {
-        return 'There is no account with this email. Please try with another one';
+        return 'There is no account with this email';
       } else if (e.code == 'user-disabled') {
         return 'User corresponding to the given email has been disabled';
       } else if (e.code == 'wrong-password') {

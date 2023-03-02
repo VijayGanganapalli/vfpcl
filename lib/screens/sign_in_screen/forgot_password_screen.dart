@@ -16,9 +16,8 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final device = Device();
-  // Text controllers
-  final TextEditingController _emailController = TextEditingController();
   bool isLoading = false;
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void dispose() {
@@ -96,7 +95,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     textInputAction: TextInputAction.done,
                     validator: (String? value) {
                       return (value!.isEmpty ||
-                              !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              !RegExp(r"^[a-zA-Z\d.a-zA-Z!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z\d]+\.[a-zA-Z]+")
                                   .hasMatch(value))
                           ? "Please enter valid email "
                           : null;
