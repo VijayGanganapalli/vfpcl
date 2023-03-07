@@ -107,10 +107,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   softWrap: true,
                 ),
                 Divider(
-                  thickness: 3,
+                  thickness: 3.2,
                   height: 60,
-                  indent: MediaQuery.of(context).size.width / 2.8,
-                  endIndent: MediaQuery.of(context).size.width / 2.8,
+                  color: defaultColor.withOpacity(0.1),
+                  indent: MediaQuery.of(context).size.width / 2.5,
+                  endIndent: MediaQuery.of(context).size.width / 2.5,
                 ),
                 const SizedBox(height: 6),
                 const CustomListTile(
